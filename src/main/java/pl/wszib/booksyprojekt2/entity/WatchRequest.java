@@ -1,0 +1,38 @@
+package pl.wszib.booksyprojekt2.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.Instant;
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "watch_requests")
+public class WatchRequest {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private LocalDate startDate;
+    private LocalDate endDate;
+
+    private Long serviceVariantId;
+    private Long stafferId;
+    private Long businessId;
+
+    @Column(nullable = false, updatable = false)
+    private Instant requestedAt;
+
+    private Instant lastCheckedAt;
+
+    private Boolean foundAtLeastOne;
+
+    @Lob
+    private String lastResponse;
+}
