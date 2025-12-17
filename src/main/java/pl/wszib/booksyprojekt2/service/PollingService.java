@@ -1,5 +1,7 @@
 package pl.wszib.booksyprojekt2.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +23,13 @@ public class PollingService {
     private final WatchRequestRepository repository;
     private final BooksyClient client;
     private final EmailService emailService;
+    private final ObjectMapper objectMapper;
 
     //booksy.poll-delay-ms (domyślnie 60s) - zależność z application.properties
     @Scheduled(fixedDelayString = "${booksy.poll-delay-ms}")
     @Transactional
     public void poll() {
-        System.out.println("*uruchomiono metodę poll w PollingService");
+        //System.out.println("*uruchomiono metodę poll w PollingService");
         List<WatchRequest> active = repository.findByFoundAtLeastOneFalse();
         if (active.isEmpty()) return;
         log.debug("Polling {} watch(es) w poszukiwaniu wolnych terminów...", active.size());
@@ -47,7 +50,21 @@ public class PollingService {
                             wr.getId(), wr.getStartDate(), wr.getEndDate());
                     System.out.println("===================================");
                     System.out.println("Znaleziono termin poprzez poszukiwanie w tle!");
-                    System.out.println(wr.getLastResponse());
+//                    System.out.println(wr.getLastResponse());
+//                    =========================niżej wstępne parsowanie, do poprawy========================================
+                    JsonNode node = objectMapper.readTree(wr.getLastResponse());
+                    JsonNode timeSlots = node.path("time_slots");
+
+                    JsonNode firstDay = timeSlots.get(0);
+
+                    String date = firstDay.path("date").asText();
+                    String time = firstDay
+                            .path("slots")
+                            .get(0)
+                            .path("t")
+                            .asText();
+                    System.out.println(date + " " + time);
+//                   =================================================================
                     emailService.sendSimpleMessage("goradominik99@gmail.com", "Znaleziono termin na Booksy!", "Cześć!\nAplikacja Booksy-project znalazła dla Ciebie termin na usługę między " + wr.getStartDate() + " a " + wr.getEndDate() + ".\nLeć się zapisać!");
                 }
                 repository.save(wr);
