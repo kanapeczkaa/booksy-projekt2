@@ -20,6 +20,7 @@ public class PollingService {
 
     private final WatchRequestRepository repository;
     private final BooksyClient client;
+    private final EmailService emailService;
 
     //booksy.poll-delay-ms (domyślnie 60s) - zależność z application.properties
     @Scheduled(fixedDelayString = "${booksy.poll-delay-ms}")
@@ -47,6 +48,7 @@ public class PollingService {
                     System.out.println("===================================");
                     System.out.println("Znaleziono termin poprzez poszukiwanie w tle!");
                     System.out.println(wr.getLastResponse());
+                    emailService.sendSimpleMessage("goradominik99@gmail.com", "Znaleziono termin na Booksy!", "Cześć!\nAplikacja Booksy-project znalazła dla Ciebie termin na usługę między " + wr.getStartDate() + " a " + wr.getEndDate() + ".\nLeć się zapisać!");
                 }
                 repository.save(wr);
             } catch (Exception e) {
