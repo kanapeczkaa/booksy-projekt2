@@ -31,7 +31,8 @@ public class PollingService {
     public void poll() {
         List<WatchRequest> active = repository.findByNeedToFindNewDatesTrue();
         if (active.isEmpty()) return;
-        log.debug("Polling {} watch(es) w poszukiwaniu wolnych terminów...", active.size());
+        log.debug("Polling {} watch(es) w poszukiwaniu wolnych terminów..."
+                , active.size());
         for (WatchRequest wr : active) {
             try {
                 var result = client.fetchTimeSlots(
@@ -59,7 +60,10 @@ public class PollingService {
                             .path("t")
                             .asText();
                     System.out.println(date + " " + time);
-                    emailService.sendSimpleMessage(wr.getEmail(), "Znaleziono termin na Booksy!", "Cześć!\nAplikacja Booksy-project znalazła dla Ciebie termin na usługę między " + wr.getStartDate() + " a " + wr.getEndDate() + ".\nLeć się zapisać!");
+                    emailService.sendSimpleMessage(wr.getEmail(),
+                            "Znaleziono termin na Booksy!",
+                            "Cześć!\nAplikacja Booksy-project znalazła dla Ciebie termin na usługę między "
+                                    + wr.getStartDate() + " a " + wr.getEndDate() + ".\nLeć się zapisać!");
                 }
                 repository.save(wr);
             } catch (Exception e) {
@@ -67,4 +71,4 @@ public class PollingService {
             }
         }
     }
-}
+}                                                                                                                                                       

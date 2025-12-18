@@ -35,7 +35,6 @@ public class WatchController {
                 wr.getNeedToFindNewDates(),
                 wr.getLastResponse()
         );
-        
         // Jeśli jeszcze brak terminów – zwróć 201 Created + Location i body z hasAny=false
         if (out.isNeedToFindNewSlots()) {
             System.out.println("===================================");

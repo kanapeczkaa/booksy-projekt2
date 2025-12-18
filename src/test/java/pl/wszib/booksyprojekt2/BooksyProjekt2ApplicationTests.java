@@ -24,7 +24,7 @@ class BooksyProjekt2ApplicationTests {
     @Test
     void contextLoads() {
     }
-
+                                                                                                                                                
 
     @Test
     public void shouldReturnWrongParameters() {

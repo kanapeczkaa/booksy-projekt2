@@ -22,7 +22,6 @@ public class WatchService {
     private final WatchRequestRepository repository;
     private final BooksyProperties props;
     private final BooksyClient booksyClient;
-    private final ObjectMapper objectMapper;
 
     @Transactional
     public WatchRequest createAndCheck(CreateWatchRequestDto dto) {
