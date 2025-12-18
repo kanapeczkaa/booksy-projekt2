@@ -17,6 +17,7 @@ public class WatchDto {
     private Long serviceVariantId;
     private Long stafferId;
     private Long businessId;
+    private String email;
     private Instant requestedAt;
     private Instant lastCheckedAt;
     private Boolean foundAtLeastOne;

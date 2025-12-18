@@ -1,5 +1,6 @@
 package pl.wszib.booksyprojekt2.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,8 @@ import pl.wszib.booksyprojekt2.dto.WatchSlotsResponseDto;
 import pl.wszib.booksyprojekt2.entity.WatchRequest;
 import pl.wszib.booksyprojekt2.service.WatchService;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 public class WatchController {
 
     private final WatchService watchService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping
     public ResponseEntity<WatchSlotsResponseDto> create(@RequestBody @Valid CreateWatchRequestDto dto) {
@@ -27,19 +31,20 @@ public class WatchController {
         WatchRequest wr = watchService.createAndCheck(dto);
         WatchSlotsResponseDto out = new WatchSlotsResponseDto(
                 wr.getId(),
-                wr.getFoundAtLeastOne(),
+                wr.getNeedToFindNewDates(),
                 wr.getLastResponse()
         );
-        // Jeśli od razu są wolne terminy – zwróć 200 OK z listą/JSONem slotów
-        if (out.isHasAny()) {
+        
+        // Jeśli jeszcze brak terminów – zwróć 201 Created + Location i body z hasAny=false
+        if (out.isNeedToFindNewSlots()) {
             System.out.println("===================================");
-            System.out.println("Znaleziono termin za pierwszym razem!");
-            return ResponseEntity.ok(out);
+            System.out.println("Wolny termin będzie poszukiwany w tle!");
+            return ResponseEntity.created(URI.create("/api/watches/" + wr.getId())).body(out);
         }
         System.out.println("===================================");
-        System.out.println("Nie znaleziono terminów!");
-        // Jeśli jeszcze brak terminów – zwróć 201 Created + Location i body z hasAny=false
-        return ResponseEntity.created(URI.create("/api/watches/" + wr.getId())).body(out);
+        System.out.println("Wolne terminy nie będą poszukiwane w tle.");
+        // Jeśli od razu są wolne terminy – zwróć 200 OK z listą/JSONem slotów
+        return ResponseEntity.ok(out);
     }
 
     @GetMapping
@@ -55,7 +60,7 @@ public class WatchController {
     @GetMapping("/{id}/slots")
     public WatchSlotsResponseDto slots(@PathVariable Long id) {
         WatchRequest wr = watchService.get(id);
-        return new WatchSlotsResponseDto(wr.getId(), wr.getFoundAtLeastOne(), wr.getLastResponse());
+        return new WatchSlotsResponseDto(wr.getId(), wr.getNeedToFindNewDates(), wr.getLastResponse());
     }
     
     //mapowanie, przeniesc to do config
@@ -67,9 +72,23 @@ public class WatchController {
                 wr.getServiceVariantId(),
                 wr.getStafferId(),
                 wr.getBusinessId(),
+                wr.getEmail(),
                 wr.getRequestedAt(),
                 wr.getLastCheckedAt(),
-                wr.getFoundAtLeastOne()
+                wr.getNeedToFindNewDates()
         );
+    }
+
+    public void readDataFromFileAndStart(String adress) {
+
+        CreateWatchRequestDto dto;
+        try {
+            dto = objectMapper.readValue(new File(adress), CreateWatchRequestDto.class);
+            System.out.println(dto.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        watchService.createAndCheck(dto);
     }
 }

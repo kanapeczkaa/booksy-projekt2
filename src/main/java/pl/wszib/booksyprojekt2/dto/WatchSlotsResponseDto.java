@@ -7,6 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class WatchSlotsResponseDto {
     private Long id;
-    private boolean hasAny;
+    private boolean needToFindNewSlots;
     private String rawJson;
 }

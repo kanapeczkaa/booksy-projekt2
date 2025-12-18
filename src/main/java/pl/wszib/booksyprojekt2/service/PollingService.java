@@ -30,8 +30,10 @@ public class PollingService {
     @Transactional
     public void poll() {
         //System.out.println("*uruchomiono metodę poll w PollingService");
-        List<WatchRequest> active = repository.findByFoundAtLeastOneFalse();
+        List<WatchRequest> active = repository.findByNeedToFindNewDatesTrue();
+//        active.
         if (active.isEmpty()) return;
+//        System.out.println(active.get(0).getLastResponse());
         log.debug("Polling {} watch(es) w poszukiwaniu wolnych terminów...", active.size());
         for (WatchRequest wr : active) {
             try {
@@ -44,8 +46,8 @@ public class PollingService {
                 );
                 wr.setLastCheckedAt(Instant.now());
                 wr.setLastResponse(result.rawJson());
-                if (result.hasSlots()) {
-                    wr.setFoundAtLeastOne(true);
+                if (result.needToFindNewSlots()) {
+                    wr.setNeedToFindNewDates(false);
                     log.info("Znaleziono dostępne terminy dla watchId={} (daty {} -> {})",
                             wr.getId(), wr.getStartDate(), wr.getEndDate());
                     System.out.println("===================================");
@@ -65,7 +67,7 @@ public class PollingService {
                             .asText();
                     System.out.println(date + " " + time);
 //                   =================================================================
-                    emailService.sendSimpleMessage("goradominik99@gmail.com", "Znaleziono termin na Booksy!", "Cześć!\nAplikacja Booksy-project znalazła dla Ciebie termin na usługę między " + wr.getStartDate() + " a " + wr.getEndDate() + ".\nLeć się zapisać!");
+                    emailService.sendSimpleMessage(wr.getEmail(), "Znaleziono termin na Booksy!", "Cześć!\nAplikacja Booksy-project znalazła dla Ciebie termin na usługę między " + wr.getStartDate() + " a " + wr.getEndDate() + ".\nLeć się zapisać!");
                 }
                 repository.save(wr);
             } catch (Exception e) {

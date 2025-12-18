@@ -3,11 +3,15 @@ package pl.wszib.booksyprojekt2.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
+@AllArgsConstructor
+@Builder
 public class CreateWatchRequestDto {
 
     @NotNull
@@ -29,4 +33,6 @@ public class CreateWatchRequestDto {
 
     @JsonProperty("business_id")
     private Long businessId;
+    
+    private String email;
 }

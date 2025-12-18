@@ -1,14 +1,18 @@
 package pl.wszib.booksyprojekt2.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.wszib.booksyprojekt2.client.BooksyClient;
 import pl.wszib.booksyprojekt2.config.BooksyProperties;
+import pl.wszib.booksyprojekt2.controller.WatchController;
 import pl.wszib.booksyprojekt2.dto.CreateWatchRequestDto;
 import pl.wszib.booksyprojekt2.entity.WatchRequest;
 import pl.wszib.booksyprojekt2.repository.WatchRequestRepository;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
@@ -18,6 +22,7 @@ public class WatchService {
     private final WatchRequestRepository repository;
     private final BooksyProperties props;
     private final BooksyClient booksyClient;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public WatchRequest createAndCheck(CreateWatchRequestDto dto) {
@@ -35,12 +40,14 @@ public class WatchService {
                 : props.getDefaultServiceVariantId());
         wr.setStafferId(dto.getStafferId() != null ? dto.getStafferId() : props.getDefaultStafferId());
         wr.setBusinessId(dto.getBusinessId() != null ? dto.getBusinessId() : props.getDefaultBusinessId());
+        wr.setEmail(dto.getEmail() != null ? dto.getEmail() : props.getDefaultEmail());
+        wr.setEmail(dto.getEmail());
         wr.setRequestedAt(Instant.now());
-        wr.setFoundAtLeastOne(false);
+        wr.setNeedToFindNewDates(true);
         return repository.save(wr);
     }
-    
-    public WatchRequest check(WatchRequest wr){
+
+    public WatchRequest check(WatchRequest wr) {
         var result = booksyClient.fetchTimeSlots(
                 wr.getBusinessId(),
                 wr.getServiceVariantId(),
@@ -50,8 +57,8 @@ public class WatchService {
         );
         wr.setLastCheckedAt(Instant.now());
         wr.setLastResponse(result.rawJson());
-        if (result.hasSlots()) {
-            wr.setFoundAtLeastOne(true);
+        if (result.needToFindNewSlots()) {
+            wr.setNeedToFindNewDates(false);
         }
         return wr;
     }
@@ -71,4 +78,6 @@ public class WatchService {
     public List<WatchRequest> getAll() {
         return repository.findAll();
     }
+
+    
 }

@@ -25,13 +25,15 @@ public class WatchRequest {
     private Long serviceVariantId;
     private Long stafferId;
     private Long businessId;
+    
+    private String email;
 
     @Column(nullable = false, updatable = false)
     private Instant requestedAt;
 
     private Instant lastCheckedAt;
 
-    private Boolean foundAtLeastOne;
+    private Boolean needToFindNewDates;
 
     @Lob
     private String lastResponse;

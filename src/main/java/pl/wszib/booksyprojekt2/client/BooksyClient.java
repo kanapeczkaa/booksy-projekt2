@@ -64,7 +64,7 @@ public class BooksyClient {
         } catch (RestClientResponseException ex) {
             String errorBody = ex.getResponseBodyAsString();
             log.warn("Błąd odpowiedzi Booksy (status {}): {}", ex.getRawStatusCode(), errorBody);
-            return new Result(errorBody, false, ex.getRawStatusCode());
+            return new Result(errorBody, true, ex.getRawStatusCode());
         }
     }
     
@@ -74,10 +74,13 @@ public class BooksyClient {
         if (node.isObject()) {
             JsonNode ts = node.get("time_slots");
             if (ts != null && ts.isArray() && ts.size() > 0) return true;
+//            usunąć, to probowalem robic aby przestawić flagę dla żądania z błędnymi danymi
+//            System.out.println("~~~~~~~~");
+//            System.out.println(ts.get(0).toString());
         } 
         return false;
     }
 
-    public record Result(String rawJson, boolean hasSlots, int statusCode) {}
+    public record Result(String rawJson, boolean needToFindNewSlots, int statusCode) {}
 }
                                                                                                                                                                         

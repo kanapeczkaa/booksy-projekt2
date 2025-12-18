@@ -17,6 +17,7 @@ public class BooksyProperties {
     private Long defaultBusinessId;
     private Long defaultServiceVariantId;
     private Long defaultStafferId;
+    private String defaultEmail;
 
     private long pollDelayMs = 60000;
 }
