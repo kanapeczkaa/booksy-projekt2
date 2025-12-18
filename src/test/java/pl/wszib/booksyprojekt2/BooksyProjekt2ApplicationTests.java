@@ -25,19 +25,6 @@ class BooksyProjekt2ApplicationTests {
     void contextLoads() {
     }
 
-    //    @BeforeAll
-//    public static void init() {
-//        System.out.println("proba");
-//        ConfigurableApplicationContext ctx = SpringApplication.run(BooksyProjekt2Application.class);
-//        
-//        watchController = ctx.getBean(WatchController.class);
-//        //MockitoAnnotations.openMocks(this);
-//    }
-    @BeforeAll
-    public static void init() {
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-    }
-
 
     @Test
     public void shouldReturnWrongParameters() {
@@ -47,10 +34,9 @@ class BooksyProjekt2ApplicationTests {
                 .serviceVariantId(9999L)
                 .stafferId(9999L)
                 .email("goradominik99@gmail.com")
-                .startDate(LocalDate.of(2026, 01, 01))
-                .endDate(LocalDate.of(2026, 01, 30))
+                .startDate(LocalDate.of(2026, 01, 30))
+                .endDate(LocalDate.of(2026, 02, 28))
                 .build();
-//        System.out.println(requestDto);
 
         ResponseEntity<WatchSlotsResponseDto> result = watchController.create(requestDto);
         System.out.println("-------------------------------");
@@ -66,15 +52,16 @@ class BooksyProjekt2ApplicationTests {
                 .serviceVariantId(21158492L)
                 .stafferId(-1L)
                 .email("goradominik99@gmail.com")
-                .startDate(LocalDate.of(2026, 01, 01))
-                .endDate(LocalDate.of(2026, 01, 5))
+                .startDate(LocalDate.of(2026, 02, 01))
+                .endDate(LocalDate.of(2026, 02, 3))
                 .build();
         ResponseEntity<WatchSlotsResponseDto> result = watchController.create(requestDto);
+        
         System.out.println("-------------------------------");
-
         System.out.println(result.toString());
         System.out.println("-------------------------------");
     }
+    
     @Test
     public void shouldReturnNoDates(){
         System.out.println("Poniżej zwraca brak terminów.");
@@ -83,12 +70,12 @@ class BooksyProjekt2ApplicationTests {
                 .serviceVariantId(21158492L)
                 .stafferId(-1L)
                 .email("goradominik99@gmail.com")
-                .startDate(LocalDate.of(2026, 01, 04))
-                .endDate(LocalDate.of(2026, 01, 4))
+                .startDate(LocalDate.of(2026, 01, 24))
+                .endDate(LocalDate.of(2026, 01, 24))
                 .build();
         ResponseEntity<WatchSlotsResponseDto> result = watchController.create(requestDto);
+        
         System.out.println("-------------------------------");
-
         System.out.println(result.toString());
         System.out.println("-------------------------------");
     }

@@ -44,6 +44,7 @@ public class WatchService {
         wr.setEmail(dto.getEmail());
         wr.setRequestedAt(Instant.now());
         wr.setNeedToFindNewDates(true);
+        System.out.println("Nowy WatchRequest:\n" + wr);
         return repository.save(wr);
     }
 
@@ -62,13 +63,7 @@ public class WatchService {
         }
         return wr;
     }
-
-    /**
-     * Tworzy watcha i od razu odpytuje Booksy. Zapisuje surową odpowiedź i
-     * ustawia flagę foundAtLeastOne, jeśli znaleziono wolne terminy.
-     */
-
-
+    
     @Transactional(readOnly = true)
     public WatchRequest get(Long id) {
         return repository.findById(id).orElseThrow(() -> new IllegalArgumentException("WatchRequest not found: " + id));

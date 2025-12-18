@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Table(name = "watch_requests")
+@ToString
 public class WatchRequest {
 
     @Id

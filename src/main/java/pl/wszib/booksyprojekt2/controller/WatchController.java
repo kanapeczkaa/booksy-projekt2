@@ -14,6 +14,7 @@ import pl.wszib.booksyprojekt2.service.WatchService;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,7 @@ public class WatchController {
         }
         System.out.println("===================================");
         System.out.println("Wolne terminy nie będą poszukiwane w tle.");
-        // Jeśli od razu są wolne terminy – zwróć 200 OK z listą/JSONem slotów
+        // Jeśli od razu są wolne terminy – zwróć 200 OK z listą wolnych terminów
         return ResponseEntity.ok(out);
     }
 
@@ -82,13 +83,14 @@ public class WatchController {
     public void readDataFromFileAndStart(String adress) {
 
         CreateWatchRequestDto dto;
-        try {
-            dto = objectMapper.readValue(new File(adress), CreateWatchRequestDto.class);
-            System.out.println(dto.toString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
-        watchService.createAndCheck(dto);
+        if (Files.exists(new File(adress).toPath())) {
+            try {
+                dto = objectMapper.readValue(new File(adress), CreateWatchRequestDto.class);
+                watchService.createAndCheck(dto);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

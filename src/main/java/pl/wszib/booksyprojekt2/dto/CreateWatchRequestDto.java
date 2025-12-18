@@ -24,7 +24,6 @@ public class CreateWatchRequestDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
-    // Opcjonalne na przyszłość – jeśli nie podane, wejdą wartości domyślne z konfiguracji
     @JsonProperty("service_variant_id")
     private Long serviceVariantId;
 

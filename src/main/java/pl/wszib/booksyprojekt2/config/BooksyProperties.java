@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "booksy")
 public class BooksyProperties {
-    /** Np. https://pl.booksy.com/core/v2/customer_api */
     private String baseUrl;
     private String apiKey;
 

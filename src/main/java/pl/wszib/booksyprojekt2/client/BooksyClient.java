@@ -74,9 +74,6 @@ public class BooksyClient {
         if (node.isObject()) {
             JsonNode ts = node.get("time_slots");
             if (ts != null && ts.isArray() && ts.size() > 0) return true;
-//            usunąć, to probowalem robic aby przestawić flagę dla żądania z błędnymi danymi
-//            System.out.println("~~~~~~~~");
-//            System.out.println(ts.get(0).toString());
         } 
         return false;
     }
