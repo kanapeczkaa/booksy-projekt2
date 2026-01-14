@@ -29,7 +29,7 @@ public class PollingService {
     @Scheduled(fixedDelayString = "${booksy.poll-delay-ms}")
     @Transactional
     public void poll() {
-        List<WatchRequest> active = repository.findByNeedToFindNewDatesTrue();
+        List<WatchRequest> active = repository.findByNeedToFindNewSlotsTrue();
         if (active.isEmpty()) return;
         log.debug("Polling {} watch(es) w poszukiwaniu wolnych terminów..."
                 , active.size());
@@ -44,8 +44,8 @@ public class PollingService {
                 );
                 wr.setLastCheckedAt(Instant.now());
                 wr.setLastResponse(result.rawJson());
-                if (result.needToFindNewSlots()) {
-                    wr.setNeedToFindNewDates(false);
+                if (result.hasSlots()) {
+                    wr.setNeedToFindNewSlots(false);
                     log.info("Znaleziono dostępne terminy dla watchId={} (daty {} -> {})",
                             wr.getId(), wr.getStartDate(), wr.getEndDate());
                     System.out.println("===================================");

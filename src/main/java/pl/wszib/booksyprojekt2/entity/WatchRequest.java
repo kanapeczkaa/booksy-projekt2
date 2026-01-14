@@ -28,7 +28,7 @@ public class WatchRequest {
     @Column(nullable = false, updatable = false)
     private Instant requestedAt;
     private Instant lastCheckedAt;
-    private Boolean needToFindNewDates;
+    private Boolean needToFindNewSlots;
     @Lob
     private String lastResponse;
 }

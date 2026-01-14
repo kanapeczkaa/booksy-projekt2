@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.wszib.booksyprojekt2.client.BooksyClient;
 import pl.wszib.booksyprojekt2.config.BooksyProperties;
-import pl.wszib.booksyprojekt2.controller.WatchController;
 import pl.wszib.booksyprojekt2.dto.CreateWatchRequestDto;
 import pl.wszib.booksyprojekt2.entity.WatchRequest;
 import pl.wszib.booksyprojekt2.repository.WatchRequestRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.List;
 
@@ -22,6 +22,7 @@ public class WatchService {
     private final WatchRequestRepository repository;
     private final BooksyProperties props;
     private final BooksyClient booksyClient;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public WatchRequest createAndCheck(CreateWatchRequestDto dto) {
@@ -29,7 +30,6 @@ public class WatchService {
         wr = check(wr);
         return repository.save(wr);
     }
-
     @Transactional
     public WatchRequest create(CreateWatchRequestDto dto) {
         WatchRequest wr = new WatchRequest();
@@ -40,9 +40,8 @@ public class WatchService {
         wr.setStafferId(dto.getStafferId() != null ? dto.getStafferId() : props.getDefaultStafferId());
         wr.setBusinessId(dto.getBusinessId() != null ? dto.getBusinessId() : props.getDefaultBusinessId());
         wr.setEmail(dto.getEmail() != null ? dto.getEmail() : props.getDefaultEmail());
-        wr.setEmail(dto.getEmail());
         wr.setRequestedAt(Instant.now());
-        wr.setNeedToFindNewDates(true);
+        wr.setNeedToFindNewSlots(true);
         System.out.println("Nowy WatchRequest:\n" + wr);
         return repository.save(wr);
     }
@@ -57,8 +56,8 @@ public class WatchService {
         );
         wr.setLastCheckedAt(Instant.now());
         wr.setLastResponse(result.rawJson());
-        if (result.needToFindNewSlots()) {
-            wr.setNeedToFindNewDates(false);
+        if (result.hasSlots()) {
+            wr.setNeedToFindNewSlots(false);
         }
         return wr;
     }
@@ -71,6 +70,20 @@ public class WatchService {
     @Transactional(readOnly = true)
     public List<WatchRequest> getAll() {
         return repository.findAll();
+    }
+
+    public void readDataFromFileAndStart(String adress) {
+        CreateWatchRequestDto dto;
+
+        if (Files.exists(new File(adress).toPath())) {
+            try {
+                dto = objectMapper.readValue(new File(adress),
+                        CreateWatchRequestDto.class);
+                createAndCheck(dto);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     

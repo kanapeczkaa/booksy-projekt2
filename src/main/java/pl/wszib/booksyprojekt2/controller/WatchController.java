@@ -1,6 +1,5 @@
 package pl.wszib.booksyprojekt2.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +10,7 @@ import pl.wszib.booksyprojekt2.dto.WatchSlotsResponseDto;
 import pl.wszib.booksyprojekt2.entity.WatchRequest;
 import pl.wszib.booksyprojekt2.service.WatchService;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +20,6 @@ import java.util.stream.Collectors;
 public class WatchController {
 
     private final WatchService watchService;
-    private final ObjectMapper objectMapper;
 
     @PostMapping
     public ResponseEntity<WatchSlotsResponseDto> create(@RequestBody @Valid CreateWatchRequestDto dto) {
@@ -32,13 +27,13 @@ public class WatchController {
         WatchRequest wr = watchService.createAndCheck(dto);
         WatchSlotsResponseDto out = new WatchSlotsResponseDto(
                 wr.getId(),
-                wr.getNeedToFindNewDates(),
+                wr.getNeedToFindNewSlots(),
                 wr.getLastResponse()
         );
         // Jeśli jeszcze brak terminów – zwróć 201 Created + Location i body z hasAny=false
         if (out.isNeedToFindNewSlots()) {
             System.out.println("===================================");
-            System.out.println("Wolny termin będzie poszukiwany w tle!");
+            System.out.println("Nie znaleziono wolnego terminu.");
             return ResponseEntity.created(URI.create("/api/watches/" + wr.getId())).body(out);
         }
         System.out.println("===================================");
@@ -60,7 +55,7 @@ public class WatchController {
     @GetMapping("/{id}/slots")
     public WatchSlotsResponseDto slots(@PathVariable Long id) {
         WatchRequest wr = watchService.get(id);
-        return new WatchSlotsResponseDto(wr.getId(), wr.getNeedToFindNewDates(), wr.getLastResponse());
+        return new WatchSlotsResponseDto(wr.getId(), wr.getNeedToFindNewSlots(), wr.getLastResponse());
     }
     
     //mapowanie, przeniesc to do config
@@ -75,21 +70,9 @@ public class WatchController {
                 wr.getEmail(),
                 wr.getRequestedAt(),
                 wr.getLastCheckedAt(),
-                wr.getNeedToFindNewDates()
+                wr.getNeedToFindNewSlots()
         );
     }
 
-    public void readDataFromFileAndStart(String adress) {
-
-        CreateWatchRequestDto dto;
-
-        if (Files.exists(new File(adress).toPath())) {
-            try {
-                dto = objectMapper.readValue(new File(adress), CreateWatchRequestDto.class);
-                watchService.createAndCheck(dto);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
+    
 }

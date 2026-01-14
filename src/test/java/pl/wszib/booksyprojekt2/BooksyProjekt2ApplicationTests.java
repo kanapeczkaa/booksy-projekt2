@@ -69,7 +69,7 @@ class BooksyProjekt2ApplicationTests {
                 .businessId(326496L)
                 .serviceVariantId(21158492L)
                 .stafferId(-1L)
-                .email("goradominik99@gmail.com")
+                .email("goralplayer@gmail.com")
                 .startDate(LocalDate.of(2026, 01, 24))
                 .endDate(LocalDate.of(2026, 01, 24))
                 .build();

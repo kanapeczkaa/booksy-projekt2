@@ -64,7 +64,7 @@ public class BooksyClient {
         } catch (RestClientResponseException ex) {
             String errorBody = ex.getResponseBodyAsString();
             log.warn("Błąd odpowiedzi Booksy (status {}): {}", ex.getRawStatusCode(), errorBody);
-            return new Result(errorBody, true, ex.getRawStatusCode());
+            return new Result(errorBody, false, ex.getRawStatusCode());
         }
     }
     
@@ -78,6 +78,6 @@ public class BooksyClient {
         return false;
     }
 
-    public record Result(String rawJson, boolean needToFindNewSlots, int statusCode) {}
+    public record Result(String rawJson, boolean hasSlots, int statusCode) {}
 }
                                                                                                                                                                         
